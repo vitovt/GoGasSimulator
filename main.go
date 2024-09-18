@@ -83,7 +83,25 @@ func main() {
     electricYFieldSlider.Step = 0.1
     electricYFieldLabel := widget.NewLabel("ElectricY Field: " + fmt.Sprintf("%.1f", electricYFieldSlider.Value))
 
-    // Adjust the size of the sliders by wrapping them in containers
+     // Create arrow components
+    arrowShaft := canvas.NewLine(color.NRGBA{R: 255, G: 0, B: 0, A: 255}) // Red color
+    arrowShaft.StrokeWidth = 2
+
+    arrowHeadLeft := canvas.NewLine(color.NRGBA{R: 255, G: 0, B: 0, A: 255})
+    arrowHeadLeft.StrokeWidth = 2
+
+    arrowHeadRight := canvas.NewLine(color.NRGBA{R: 255, G: 0, B: 0, A: 255})
+    arrowHeadRight.StrokeWidth = 2
+
+    // Add arrow components to the container
+    moleculeContainer.Add(arrowShaft)
+    moleculeContainer.Add(arrowHeadLeft)
+    moleculeContainer.Add(arrowHeadRight)
+
+    // Initial update of the arrow
+    updateArrow(arrowShaft, arrowHeadLeft, arrowHeadRight, moleculeContainer, electricXFieldSlider.Value, electricYFieldSlider.Value)
+
+   // Adjust the size of the sliders by wrapping them in containers
     sliderWidth := 200.0
 
     // Create containers for sliders with fixed size
@@ -259,10 +277,12 @@ func main() {
     // Update electricX field label when slider changes
     electricXFieldSlider.OnChanged = func(value float64) {
         electricXFieldLabel.SetText("ElectricX Field: " + fmt.Sprintf("%.1f", value))
+        updateArrow(arrowShaft, arrowHeadLeft, arrowHeadRight, moleculeContainer, value, electricYFieldSlider.Value)
     }
     // Update electricY field label when slider changes
     electricYFieldSlider.OnChanged = func(value float64) {
         electricYFieldLabel.SetText("ElectricY Field: " + fmt.Sprintf("%.1f", value))
+        updateArrow(arrowShaft, arrowHeadLeft, arrowHeadRight, moleculeContainer, electricXFieldSlider.Value, value)
     }
 
     myWindow.ShowAndRun()
@@ -418,3 +438,53 @@ func handleCollision(m1, m2 *Molecule) {
     }
 }
 
+// Function to update the arrow's position and orientation
+func updateArrow(arrowShaft, arrowHeadLeft, arrowHeadRight *canvas.Line, moleculeContainer *fyne.Container, E_x, E_y float64) {
+    // Calculate center point
+    centerX := moleculeContainer.Size().Width / 2
+    centerY := moleculeContainer.Size().Height / 2
+
+    E_y = -E_y
+
+    // Calculate the magnitude and angle of the electric field
+    magnitude := math.Sqrt(E_x*E_x + E_y*E_y)
+    angle := math.Atan2(E_y, E_x)
+
+    // Scale the arrow length (adjust scalingFactor as needed)
+    scalingFactor := float64(moleculeContainer.Size().Width) / 10 // Adjust this to make the arrow visible but not too big
+    arrowLength := float32(magnitude * scalingFactor)
+
+    // Calculate end point of the arrow shaft
+    endX := centerX + arrowLength*float32(math.Cos(angle))
+    endY := centerY + arrowLength*float32(math.Sin(angle))
+
+    // Update the shaft
+    arrowShaft.Position1 = fyne.NewPos(centerX, centerY)
+    arrowShaft.Position2 = fyne.NewPos(endX, endY)
+
+    // Calculate points for arrowhead
+    headLength := arrowLength * 0.2 // Length of the arrowhead lines
+    headAngle := math.Pi / 6        // 30 degrees for arrowhead
+
+    // Left side of arrowhead
+    leftAngle := angle + math.Pi - headAngle
+    leftX := endX + headLength*float32(math.Cos(leftAngle))
+    leftY := endY + headLength*float32(math.Sin(leftAngle))
+
+    // Right side of arrowhead
+    rightAngle := angle + math.Pi + headAngle
+    rightX := endX + headLength*float32(math.Cos(rightAngle))
+    rightY := endY + headLength*float32(math.Sin(rightAngle))
+
+    // Update arrowhead lines
+    arrowHeadLeft.Position1 = fyne.NewPos(endX, endY)
+    arrowHeadLeft.Position2 = fyne.NewPos(leftX, leftY)
+
+    arrowHeadRight.Position1 = fyne.NewPos(endX, endY)
+    arrowHeadRight.Position2 = fyne.NewPos(rightX, rightY)
+
+    // Refresh the lines
+    arrowShaft.Refresh()
+    arrowHeadLeft.Refresh()
+    arrowHeadRight.Refresh()
+}
