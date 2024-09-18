@@ -11,6 +11,7 @@ import (
     "fyne.io/fyne/v2/app"
     "fyne.io/fyne/v2/canvas"
     "fyne.io/fyne/v2/container"
+    "fyne.io/fyne/v2/layout"
     "fyne.io/fyne/v2/widget"
 )
 
@@ -48,6 +49,7 @@ func main() {
 
     // Create a container without layout to control absolute positioning
     moleculeContainer := container.NewWithoutLayout()
+    moleculeContainer.Resize(fyne.NewSize(windowWidth, windowHeight))
 
     // Initialize molecules
     molecules := make([]*Molecule, 0, moleculesCount)
@@ -134,6 +136,35 @@ func main() {
     temperatureSlider.Step = 10.0
     temperatureLabel := widget.NewLabel("Temperature: " + fmt.Sprintf("%.1f", previousTemperature) + "K")
 
+    // Electric field slider
+    electricFieldSlider := widget.NewSlider(-5, 5)
+    electricFieldSlider.Value = 0 // Starting electric field
+    electricFieldSlider.Step = 0.1
+    electricFieldLabel := widget.NewLabel("Electric Field: " + fmt.Sprintf("%.1f", electricFieldSlider.Value))
+
+    // Adjust the size of the sliders by wrapping them in containers
+    sliderWidth := 200.0
+
+    // Create containers for sliders with fixed size
+    temperatureSliderContainer := container.New(
+        layout.NewGridWrapLayout(fyne.NewSize(float32(sliderWidth), temperatureSlider.MinSize().Height)),
+        temperatureSlider,
+    )
+    electricFieldSliderContainer := container.New(
+        layout.NewGridWrapLayout(fyne.NewSize(float32(sliderWidth), electricFieldSlider.MinSize().Height)),
+        electricFieldSlider,
+    )
+
+    // Arrange labels and sliders on the same line
+    temperatureControl := container.NewHBox(
+        temperatureLabel,
+        temperatureSliderContainer,
+    )
+    electricFieldControl := container.NewHBox(
+        electricFieldLabel,
+        electricFieldSliderContainer,
+    )
+
     // Update temperature label and adjust velocities when slider changes
     temperatureSlider.OnChanged = func(value float64) {
         temperatureLabel.SetText("Temperature: " + fmt.Sprintf("%.1f", value) + "K")
@@ -151,21 +182,27 @@ func main() {
         previousTemperature = value
     }
 
-    // Electric field slider
-    electricFieldSlider := widget.NewSlider(-5, 5)
-    electricFieldSlider.Value = 0 // Starting electric field
-    electricFieldSlider.Step = 0.1
-    electricFieldLabel := widget.NewLabel("Electric Field: 0.0")
-
     // Update electric field label when slider changes
     electricFieldSlider.OnChanged = func(value float64) {
         electricFieldLabel.SetText("Electric Field: " + fmt.Sprintf("%.1f", value))
     }
 
+    // Controls container
     controls := container.NewVBox(
-        temperatureLabel, temperatureSlider,
-        electricFieldLabel, electricFieldSlider,
+        temperatureControl,
+        electricFieldControl,
     )
+
+    // Layout the controls and simulation area
+    content := container.NewVBox(
+        controls,
+        moleculeContainer,
+    )
+
+    // Set the content and show the window
+    myWindow.SetContent(content)
+    // Adjust window size to accommodate controls and molecule area
+    myWindow.Resize(fyne.NewSize(windowWidth, windowHeight+100))
 
     // Animation loop
     go func() {
@@ -227,12 +264,6 @@ func main() {
         }
     }()
 
-    // Layout the controls and simulation area
-    content := container.NewBorder(controls, nil, nil, nil, moleculeContainer)
-
-    // Set the content and show the window
-    myWindow.SetContent(content)
-    myWindow.Resize(fyne.NewSize(windowWidth, windowHeight))
     myWindow.ShowAndRun()
 }
 
