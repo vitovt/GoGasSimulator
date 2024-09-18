@@ -71,11 +71,17 @@ func main() {
     gravitySlider.Step = 0.1
     gravityLabel := widget.NewLabel("Gravity: " + fmt.Sprintf("%.1f", gravitySlider.Value) + "g")
 
-    // Electric field slider
-    electricFieldSlider := widget.NewSlider(-5, 5)
-    electricFieldSlider.Value = 0 // Starting electric field
-    electricFieldSlider.Step = 0.1
-    electricFieldLabel := widget.NewLabel("Electric Field: " + fmt.Sprintf("%.1f", electricFieldSlider.Value))
+    // ElectricX field slider
+    electricXFieldSlider := widget.NewSlider(-5, 5)
+    electricXFieldSlider.Value = 0 // Starting electric field
+    electricXFieldSlider.Step = 0.1
+    electricXFieldLabel := widget.NewLabel("ElectricX Field: " + fmt.Sprintf("%.1f", electricXFieldSlider.Value))
+
+    // ElectricY field slider
+    electricYFieldSlider := widget.NewSlider(-5, 5)
+    electricYFieldSlider.Value = 0 // Starting electric field
+    electricYFieldSlider.Step = 0.1
+    electricYFieldLabel := widget.NewLabel("ElectricY Field: " + fmt.Sprintf("%.1f", electricYFieldSlider.Value))
 
     // Adjust the size of the sliders by wrapping them in containers
     sliderWidth := 200.0
@@ -89,9 +95,13 @@ func main() {
         layout.NewGridWrapLayout(fyne.NewSize(float32(sliderWidth), temperatureSlider.MinSize().Height)),
         gravitySlider,
     )
-    electricFieldSliderContainer := container.New(
-        layout.NewGridWrapLayout(fyne.NewSize(float32(sliderWidth), electricFieldSlider.MinSize().Height)),
-        electricFieldSlider,
+    electricXFieldSliderContainer := container.New(
+        layout.NewGridWrapLayout(fyne.NewSize(float32(sliderWidth), electricXFieldSlider.MinSize().Height)),
+        electricXFieldSlider,
+    )
+    electricYFieldSliderContainer := container.New(
+        layout.NewGridWrapLayout(fyne.NewSize(float32(sliderWidth), electricYFieldSlider.MinSize().Height)),
+        electricYFieldSlider,
     )
 
     // Arrange labels and sliders on the same line
@@ -101,15 +111,17 @@ func main() {
         gravityLabel,
         gravitySliderContainer,
     )
-    electricFieldControl := container.NewHBox(
-        electricFieldLabel,
-        electricFieldSliderContainer,
+    bottomControl := container.NewHBox(
+        electricXFieldLabel,
+        electricXFieldSliderContainer,
+        electricYFieldLabel,
+        electricYFieldSliderContainer,
     )
 
     // Controls container
     controls := container.NewVBox(
         topControl,
-        electricFieldControl,
+        bottomControl,
     )
 
     // Layout the controls and simulation area
@@ -156,16 +168,24 @@ func main() {
             for i := 0; i < moleculesCount; i++ {
                 m1 := molecules[i]
 
-                // Apply electric field force to charged particle
-                if m1.isCharged && electricFieldSlider.Value != 0 {
-                    // Electric field applies a force in the X-direction
-                    electricForce := electricFieldSlider.Value * 0.1 // Adjust the multiplier as needed
-                    m1.velX += electricForce
+                // Apply electricX field force to charged particle
+                if m1.isCharged && electricXFieldSlider.Value != 0 {
+                    // ElectricX field applies a force in the X-direction
+                    electricXForce := electricXFieldSlider.Value * 0.1 // Adjust the multiplier as needed
+                    m1.velX += electricXForce
                 }
+
+                // Apply electricY field force to charged particle
+                if m1.isCharged && electricYFieldSlider.Value != 0 {
+                    // ElectricY field applies a force in the Y-direction
+                    electricYForce := electricYFieldSlider.Value * 0.1 // Adjust the multiplier as needed
+                    m1.velY += electricYForce
+                }
+
 
                 // Apply gravity field force to all particles
                 if gravitySlider.Value != 0 {
-                    // Electric field applies a force in the X-direction
+                    // Gravity field applies a force in the Y-direction
                     gravityForce := gravitySlider.Value * 0.01 // Adjust the multiplier as needed
                     m1.velY += gravityForce
                 }
@@ -236,9 +256,13 @@ func main() {
         gravityLabel.SetText("Gravity: " + fmt.Sprintf("%.1f", value) + "g")
     }
 
-    // Update electric field label when slider changes
-    electricFieldSlider.OnChanged = func(value float64) {
-        electricFieldLabel.SetText("Electric Field: " + fmt.Sprintf("%.1f", value))
+    // Update electricX field label when slider changes
+    electricXFieldSlider.OnChanged = func(value float64) {
+        electricXFieldLabel.SetText("ElectricX Field: " + fmt.Sprintf("%.1f", value))
+    }
+    // Update electricY field label when slider changes
+    electricYFieldSlider.OnChanged = func(value float64) {
+        electricYFieldLabel.SetText("ElectricY Field: " + fmt.Sprintf("%.1f", value))
     }
 
     myWindow.ShowAndRun()
