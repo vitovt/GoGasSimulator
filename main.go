@@ -16,7 +16,7 @@ import (
 )
 
 // Constants and Variables
-const (
+var (
     moleculesCount = 100
     windowWidth   = 800
     windowHeight  = 600
@@ -49,10 +49,12 @@ func main() {
 
     // Create a container without layout to control absolute positioning
     moleculeContainer := container.NewWithoutLayout()
-    moleculeContainer.Resize(fyne.NewSize(windowWidth, windowHeight))
 
-    // Initialize molecules after the window and content have been set
-    molecules := initializeMolecules(moleculeContainer)
+    // Create a visual border
+    border := canvas.NewRectangle(color.Transparent)
+    border.StrokeColor = color.Black
+    border.StrokeWidth = 2
+    moleculeContainer.Add(border)
 
     // Initial temperature value
     var previousTemperature = 300.0 // Initial temperature value
@@ -99,21 +101,43 @@ func main() {
     )
 
     // Layout the controls and simulation area
-    content := container.NewVBox(
-        controls,
-        moleculeContainer,
+    content := container.NewBorder(
+        controls,            // Top
+        nil,                 // Bottom
+        nil,                 // Left
+        nil,                 // Right
+        moleculeContainer,   // Center
     )
 
     // Set the content and show the window
     myWindow.SetContent(content)
     // Adjust window size to accommodate controls and molecule area
     myWindow.Resize(fyne.NewSize(windowWidth, windowHeight+100))
+    // Initialize molecules after the window and content have been set
+    molecules := initializeMolecules(moleculeContainer)
+
+    // Handle window resize events
+    myWindow.Canvas().SetOnTypedKey(func(event *fyne.KeyEvent) {
+        // Optional: Handle keyboard events if needed
+    })
+
+    // Update moleculeContainer and border size when the window is resized
+    myWindow.SetOnClosed(func() {
+        // Clean up if necessary
+    })
 
     // Animation loop
     go func() {
         ticker := time.NewTicker(16 * time.Millisecond) // Approximately 60 FPS
         defer ticker.Stop()
         for range ticker.C {
+            // Update windowWidth and windowHeight based on moleculeContainer size
+            windowWidth = float64(moleculeContainer.Size().Width)
+            windowHeight = float64(moleculeContainer.Size().Height)
+
+            // Update the border size
+            border.Resize(moleculeContainer.Size())
+
             // Update molecule positions and velocities
             for i := 0; i < moleculesCount; i++ {
                 m1 := molecules[i]
@@ -196,6 +220,9 @@ func main() {
 
 // Initialize molecules function
 func initializeMolecules(moleculeContainer *fyne.Container) []*Molecule {
+    // Get the initial size of the molecule container
+    windowWidth = float64(moleculeContainer.Size().Width)
+    windowHeight = float64(moleculeContainer.Size().Height)
 
     molecules := make([]*Molecule, 0, moleculesCount)
     minDistance := 2.0 * float64(moleculeSize)
