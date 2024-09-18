@@ -122,12 +122,43 @@ func main() {
         electricYFieldSlider,
     )
 
+    // Initialize molecules after the window and content have been set
+    molecules := initializeMolecules(moleculeContainer)
+
+    // Create the Reset button
+    resetButton := widget.NewButton("Reset", func() {
+        // Reset sliders to default values
+        temperatureSlider.SetValue(300.0)
+        gravitySlider.SetValue(0)
+        electricXFieldSlider.SetValue(0)
+        electricYFieldSlider.SetValue(0)
+
+        // Reset labels
+        temperatureLabel.SetText("Temperature: 300.0K")
+        gravityLabel.SetText("Gravity: 0.0g")
+        electricXFieldLabel.SetText("ElectricX Field: 0.0")
+        electricYFieldLabel.SetText("ElectricY Field: 0.0")
+
+        // Reset previousTemperature
+        previousTemperature = 300.0
+
+        // Reset molecule velocities
+        for _, m := range molecules {
+            // Random initial velocity based on default temperature
+            angle := rand.Float64() * 2 * math.Pi
+            speed := rand.Float64()*(maxSpeed - minSpeed) + minSpeed
+            m.velX = speed * math.Cos(angle)
+            m.velY = speed * math.Sin(angle)
+        }
+    })
+
     // Arrange labels and sliders on the same line
     topControl := container.NewHBox(
         temperatureLabel,
         temperatureSliderContainer,
         gravityLabel,
         gravitySliderContainer,
+        resetButton,
     )
     bottomControl := container.NewHBox(
         electricXFieldLabel,
@@ -155,8 +186,6 @@ func main() {
     myWindow.SetContent(content)
     // Adjust window size to accommodate controls and molecule area
     myWindow.Resize(fyne.NewSize(float32(windowWidth), float32(windowHeight+100)))
-    // Initialize molecules after the window and content have been set
-    molecules := initializeMolecules(moleculeContainer)
 
     // Handle window resize events
     myWindow.Canvas().SetOnTypedKey(func(event *fyne.KeyEvent) {
