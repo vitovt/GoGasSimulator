@@ -35,6 +35,7 @@ type Molecule struct {
     posY      float64
     velX      float64
     velY      float64
+    isCharged bool
 }
 
 func main() {
@@ -43,7 +44,7 @@ func main() {
 
     // Create a new application
     myApp := app.New()
-    myWindow := myApp.NewWindow("Ideal Gas Simulation")
+    myWindow := myApp.NewWindow("Ideal Gas Simulation with Electric Field")
 
     // Create a container without layout to control absolute positioning
     moleculeContainer := container.NewWithoutLayout()
@@ -95,11 +96,15 @@ func main() {
 
         // Create a circle for the molecule
         var circle *canvas.Circle
+        var isCharged bool
+
         if i == 0 {
             // First molecule is the charged particle
             circle = canvas.NewCircle(chargedColor) // Use chargedColor variable
+            isCharged = true
         } else {
             circle = canvas.NewCircle(moleculesColor) // Use moleculesColor variable
+            isCharged = false
         }
 
         circle.Resize(fyne.NewSize(moleculeSize, moleculeSize))
@@ -115,6 +120,7 @@ func main() {
             posY:      posY,
             velX:      velX,
             velY:      velY,
+            isCharged: isCharged,
         }
         molecules = append(molecules, molecule)
     }
@@ -145,7 +151,21 @@ func main() {
         previousTemperature = value
     }
 
-    controls := container.NewVBox(temperatureLabel, temperatureSlider)
+    // Electric field slider
+    electricFieldSlider := widget.NewSlider(-5, 5)
+    electricFieldSlider.Value = 0 // Starting electric field
+    electricFieldSlider.Step = 0.1
+    electricFieldLabel := widget.NewLabel("Electric Field: 0.0")
+
+    // Update electric field label when slider changes
+    electricFieldSlider.OnChanged = func(value float64) {
+        electricFieldLabel.SetText("Electric Field: " + fmt.Sprintf("%.1f", value))
+    }
+
+    controls := container.NewVBox(
+        temperatureLabel, temperatureSlider,
+        electricFieldLabel, electricFieldSlider,
+    )
 
     // Animation loop
     go func() {
@@ -156,6 +176,12 @@ func main() {
             for i := 0; i < moleculesCount; i++ {
                 m1 := molecules[i]
 
+                // Apply electric field force to charged particle
+                if m1.isCharged && electricFieldSlider.Value != 0 {
+                    // Electric field applies a force in the X-direction
+                    electricForce := electricFieldSlider.Value * 0.1 // Adjust the multiplier as needed
+                    m1.velX += electricForce
+                }
 
                 // Update position
                 m1.posX += m1.velX
