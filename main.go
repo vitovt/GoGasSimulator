@@ -223,9 +223,6 @@ func main() {
 // Initialize molecules function
 func initializeMolecules(moleculeContainer *fyne.Container) []*Molecule {
     // Get the initial size of the molecule container
-    windowWidth = float64(moleculeContainer.Size().Width)
-    windowHeight = float64(moleculeContainer.Size().Height)
-
     molecules := make([]*Molecule, 0, moleculesCount)
     minDistance := 2.0 * float64(moleculeSize)
 
