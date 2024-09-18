@@ -18,9 +18,9 @@ import (
 // Constants and Variables
 var (
     moleculesCount = 100
-    windowWidth   = 800
-    windowHeight  = 600
-    moleculeSize  = 8
+    windowWidth  = 800.0
+    windowHeight  = 600.0 
+    moleculeSize  = 8.0
     minSpeed      = 1.0
     maxSpeed      = 5.0
 )
@@ -112,7 +112,7 @@ func main() {
     // Set the content and show the window
     myWindow.SetContent(content)
     // Adjust window size to accommodate controls and molecule area
-    myWindow.Resize(fyne.NewSize(windowWidth, windowHeight+100))
+    myWindow.Resize(fyne.NewSize(float32(windowWidth), float32(windowHeight+100)))
     // Initialize molecules after the window and content have been set
     molecules := initializeMolecules(moleculeContainer)
 
@@ -134,6 +134,8 @@ func main() {
             // Update windowWidth and windowHeight based on moleculeContainer size
             windowWidth = float64(moleculeContainer.Size().Width)
             windowHeight = float64(moleculeContainer.Size().Height)
+
+
 
             // Update the border size
             border.Resize(moleculeContainer.Size())
@@ -281,7 +283,7 @@ func initializeMolecules(moleculeContainer *fyne.Container) []*Molecule {
             isCharged = false
         }
 
-        circle.Resize(fyne.NewSize(moleculeSize, moleculeSize))
+        circle.Resize(fyne.NewSize(float32(moleculeSize), float32(moleculeSize)))
         circle.Move(fyne.NewPos(float32(posX), float32(posY)))
 
         // Add to container
