@@ -119,15 +119,30 @@ func main() {
         molecules = append(molecules, molecule)
     }
 
-    // Temperature slider
-    temperatureSlider := widget.NewSlider(1, 10)
-    temperatureSlider.Value = 5 // Starting temperature
-    temperatureSlider.Step = 0.1
-    temperatureLabel := widget.NewLabel("Temperature: 5.0")
+    // Initial temperature value
+    var previousTemperature = 300.0 // Initial temperature value
 
-    // Update temperature label when slider changes
+    // Temperature slider
+    temperatureSlider := widget.NewSlider(2, 1000)
+    temperatureSlider.Value = previousTemperature
+    temperatureSlider.Step = 10.0
+    temperatureLabel := widget.NewLabel("Temperature: " + fmt.Sprintf("%.1f", previousTemperature) + "K")
+
+    // Update temperature label and adjust velocities when slider changes
     temperatureSlider.OnChanged = func(value float64) {
-        temperatureLabel.SetText("Temperature: " + fmt.Sprintf("%.1f", value))
+        temperatureLabel.SetText("Temperature: " + fmt.Sprintf("%.1f", value) + "K")
+
+        // Calculate the scaling factor
+        scalingFactor := math.Sqrt(value / previousTemperature)
+
+        // Adjust velocities of all molecules
+        for _, m := range molecules {
+            m.velX *= scalingFactor
+            m.velY *= scalingFactor
+        }
+
+        // Update the previous temperature
+        previousTemperature = value
     }
 
     controls := container.NewVBox(temperatureLabel, temperatureSlider)
@@ -141,10 +156,6 @@ func main() {
             for i := 0; i < moleculesCount; i++ {
                 m1 := molecules[i]
 
-                // Adjust velocity based on temperature
-                speedFactor := temperatureSlider.Value / 5.0 // Normalize to initial temperature
-                m1.velX *= speedFactor
-                m1.velY *= speedFactor
 
                 // Update position
                 m1.posX += m1.velX
