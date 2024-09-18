@@ -23,6 +23,10 @@ const (
     maxSpeed      = 5.0
 )
 
+// Color variables
+var (
+    moleculesColor = color.NRGBA{R: 0, G: 0, B: 255, A: 255}   // Blue color for uncharged molecules
+
 type Molecule struct {
     circle *canvas.Circle
     posX   float64
@@ -56,7 +60,7 @@ func main() {
         velY := speed * math.Sin(angle)
 
         // Create a circle for the molecule
-        circle := canvas.NewCircle(randomColor())
+        circle = canvas.NewCircle(moleculesColor)
         circle.Resize(fyne.NewSize(moleculeSize, moleculeSize))
         circle.Move(fyne.NewPos(float32(posX), float32(posY)))
 
@@ -151,16 +155,6 @@ func main() {
     myWindow.SetContent(content)
     myWindow.Resize(fyne.NewSize(windowWidth, windowHeight))
     myWindow.ShowAndRun()
-}
-
-// Function to generate a random color
-func randomColor() color.Color {
-    return color.NRGBA{
-        R: uint8(rand.Intn(256)),
-        G: uint8(rand.Intn(256)),
-        B: uint8(rand.Intn(256)),
-        A: 255,
-    }
 }
 
 // Function to check if two molecules are colliding
