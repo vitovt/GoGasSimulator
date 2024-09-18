@@ -14,6 +14,7 @@ import (
     "fyne.io/fyne/v2/widget"
 )
 
+// Constants and Variables
 const (
     moleculesCount = 100
     windowWidth   = 800
@@ -23,16 +24,17 @@ const (
     maxSpeed      = 5.0
 )
 
-// Color variables
 var (
-    moleculesColor = color.NRGBA{R: 0, G: 0, B: 255, A: 255}   // Blue color for uncharged molecules
+    moleculesColor = color.NRGBA{R: 0, G: 0, B: 255, A: 255} // Blue color for uncharged molecules
+    chargedColor   = color.NRGBA{R: 255, G: 0, B: 0, A: 255} // Red color for the charged particle
+)
 
 type Molecule struct {
-    circle *canvas.Circle
-    posX   float64
-    posY   float64
-    velX   float64
-    velY   float64
+    circle    *canvas.Circle
+    posX      float64
+    posY      float64
+    velX      float64
+    velY      float64
 }
 
 func main() {
@@ -92,7 +94,14 @@ func main() {
         velY := speed * math.Sin(angle)
 
         // Create a circle for the molecule
-        circle = canvas.NewCircle(moleculesColor)
+        var circle *canvas.Circle
+        if i == 0 {
+            // First molecule is the charged particle
+            circle = canvas.NewCircle(chargedColor) // Use chargedColor variable
+        } else {
+            circle = canvas.NewCircle(moleculesColor) // Use moleculesColor variable
+        }
+
         circle.Resize(fyne.NewSize(moleculeSize, moleculeSize))
         circle.Move(fyne.NewPos(float32(posX), float32(posY)))
 
