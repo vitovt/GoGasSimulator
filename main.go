@@ -207,28 +207,55 @@ func handleCollision(m1, m2 *Molecule) {
 
     if distance == 0 {
         // Avoid division by zero
-        return
+        // Apply a small random displacement
+        displacement := float64(moleculeSize) * 0.01
+        dx = displacement * (rand.Float64()*2 - 1)
+        dy = displacement * (rand.Float64()*2 - 1)
+        distance = math.Sqrt(dx*dx + dy*dy)
     }
 
-    nx := dx / distance
-    ny := dy / distance
+    // Minimum distance between molecules to avoid overlap
+    minDistance := float64(moleculeSize)
 
-    // Relative velocity
-    dvx := m1.velX - m2.velX
-    dvy := m1.velY - m2.velY
+    // Calculate overlap amount
+    overlap := minDistance - distance
 
-    // Dot product of relative velocity and normal vector
-    dotProduct := dvx*nx + dvy*ny
+    if overlap > 0 {
+        // Normalize the collision normal vector
+        nx := dx / distance
+        ny := dy / distance
 
-    if dotProduct > 0 {
-        // Molecules are moving away from each other
-        return
+        // Push molecules apart based on their masses (assuming equal mass)
+        m1.posX -= nx * overlap / 2
+        m1.posY -= ny * overlap / 2
+        m2.posX += nx * overlap / 2
+        m2.posY += ny * overlap / 2
+
+        // Update distance after position correction
+        distance = minDistance
+        dx = m2.posX - m1.posX
+        dy = m2.posY - m1.posY
+        nx = dx / distance
+        ny = dy / distance
+
+        // Relative velocity
+        dvx := m1.velX - m2.velX
+        dvy := m1.velY - m2.velY
+
+        // Dot product of relative velocity and normal vector
+        dotProduct := dvx*nx + dvy*ny
+
+        // Compute restitution (e = 1 for perfectly elastic collision)
+        e := 1.0
+
+        // Impulse scalar
+        impulse := -(1 + e) * dotProduct / 2 // Divide by 2 for equal mass
+
+        // Update velocities
+        m1.velX += impulse * nx
+        m1.velY += impulse * ny
+        m2.velX -= impulse * nx
+        m2.velY -= impulse * ny
     }
-
-    // Exchange velocities (simplified elastic collision)
-    m1.velX -= dotProduct * nx
-    m1.velY -= dotProduct * ny
-    m2.velX += dotProduct * nx
-    m2.velY += dotProduct * ny
 }
 
