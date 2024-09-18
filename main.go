@@ -47,11 +47,43 @@ func main() {
     moleculeContainer := container.NewWithoutLayout()
 
     // Initialize molecules
-    molecules := make([]*Molecule, moleculesCount)
+    molecules := make([]*Molecule, 0, moleculesCount)
+    minDistance := 2.0 * float64(moleculeSize)
+
     for i := 0; i < moleculesCount; i++ {
-        // Random initial position avoiding overlap
-        posX := rand.Float64()*(windowWidth-moleculeSize*2) + moleculeSize
-        posY := rand.Float64()*(windowHeight-moleculeSize*2) + moleculeSize
+        var posX, posY float64
+        maxAttempts := 1000
+        attempts := 0
+
+        // Loop to find a valid position
+        for {
+            // Random initial position
+            posX = rand.Float64()*(windowWidth-moleculeSize*2) + moleculeSize
+            posY = rand.Float64()*(windowHeight-moleculeSize*2) + moleculeSize
+
+            validPosition := true
+
+            // Check against all previously placed molecules
+            for _, m := range molecules {
+                dx := posX - m.posX
+                dy := posY - m.posY
+                distance := math.Sqrt(dx*dx + dy*dy)
+                if distance < minDistance {
+                    validPosition = false
+                    break
+                }
+            }
+
+            if validPosition {
+                break
+            }
+
+            attempts++
+            if attempts >= maxAttempts {
+                fmt.Println("Warning: Max attempts reached while placing molecule", i)
+                break
+            }
+        }
 
         // Random initial velocity
         angle := rand.Float64() * 2 * math.Pi
@@ -68,13 +100,14 @@ func main() {
         moleculeContainer.Add(circle)
 
         // Add to molecule slice
-        molecules[i] = &Molecule{
-            circle: circle,
-            posX:   posX,
-            posY:   posY,
-            velX:   velX,
-            velY:   velY,
+        molecule := &Molecule{
+            circle:    circle,
+            posX:      posX,
+            posY:      posY,
+            velX:      velX,
+            velY:      velY,
         }
+        molecules = append(molecules, molecule)
     }
 
     // Temperature slider
