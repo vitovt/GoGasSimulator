@@ -65,6 +65,12 @@ func main() {
     temperatureSlider.Step = 10.0
     temperatureLabel := widget.NewLabel("Temperature: " + fmt.Sprintf("%.1f", previousTemperature) + "K")
 
+    // Gravity slider
+    gravitySlider := widget.NewSlider(0, 20)
+    gravitySlider.Value = 0
+    gravitySlider.Step = 0.1
+    gravityLabel := widget.NewLabel("Gravity: " + fmt.Sprintf("%.1f", gravitySlider.Value) + "g")
+
     // Electric field slider
     electricFieldSlider := widget.NewSlider(-5, 5)
     electricFieldSlider.Value = 0 // Starting electric field
@@ -79,15 +85,21 @@ func main() {
         layout.NewGridWrapLayout(fyne.NewSize(float32(sliderWidth), temperatureSlider.MinSize().Height)),
         temperatureSlider,
     )
+    gravitySliderContainer := container.New(
+        layout.NewGridWrapLayout(fyne.NewSize(float32(sliderWidth), temperatureSlider.MinSize().Height)),
+        gravitySlider,
+    )
     electricFieldSliderContainer := container.New(
         layout.NewGridWrapLayout(fyne.NewSize(float32(sliderWidth), electricFieldSlider.MinSize().Height)),
         electricFieldSlider,
     )
 
     // Arrange labels and sliders on the same line
-    temperatureControl := container.NewHBox(
+    topControl := container.NewHBox(
         temperatureLabel,
         temperatureSliderContainer,
+        gravityLabel,
+        gravitySliderContainer,
     )
     electricFieldControl := container.NewHBox(
         electricFieldLabel,
@@ -96,7 +108,7 @@ func main() {
 
     // Controls container
     controls := container.NewVBox(
-        temperatureControl,
+        topControl,
         electricFieldControl,
     )
 
@@ -149,6 +161,13 @@ func main() {
                     // Electric field applies a force in the X-direction
                     electricForce := electricFieldSlider.Value * 0.1 // Adjust the multiplier as needed
                     m1.velX += electricForce
+                }
+
+                // Apply gravity field force to all particles
+                if gravitySlider.Value != 0 {
+                    // Electric field applies a force in the X-direction
+                    gravityForce := gravitySlider.Value * 0.01 // Adjust the multiplier as needed
+                    m1.velY += gravityForce
                 }
 
                 // Update position
@@ -210,6 +229,11 @@ func main() {
 
         // Update the previous temperature
         previousTemperature = value
+    }
+
+    // Update gravity label when slider changes
+    gravitySlider.OnChanged = func(value float64) {
+        gravityLabel.SetText("Gravity: " + fmt.Sprintf("%.1f", value) + "g")
     }
 
     // Update electric field label when slider changes
