@@ -51,81 +51,8 @@ func main() {
     moleculeContainer := container.NewWithoutLayout()
     moleculeContainer.Resize(fyne.NewSize(windowWidth, windowHeight))
 
-    // Initialize molecules
-    molecules := make([]*Molecule, 0, moleculesCount)
-    minDistance := 2.0 * float64(moleculeSize)
-
-    for i := 0; i < moleculesCount; i++ {
-        var posX, posY float64
-        maxAttempts := 1000
-        attempts := 0
-
-        // Loop to find a valid position
-        for {
-            // Random initial position
-            posX = rand.Float64()*(windowWidth-moleculeSize*2) + moleculeSize
-            posY = rand.Float64()*(windowHeight-moleculeSize*2) + moleculeSize
-
-            validPosition := true
-
-            // Check against all previously placed molecules
-            for _, m := range molecules {
-                dx := posX - m.posX
-                dy := posY - m.posY
-                distance := math.Sqrt(dx*dx + dy*dy)
-                if distance < minDistance {
-                    validPosition = false
-                    break
-                }
-            }
-
-            if validPosition {
-                break
-            }
-
-            attempts++
-            if attempts >= maxAttempts {
-                fmt.Println("Warning: Max attempts reached while placing molecule", i)
-                break
-            }
-        }
-
-        // Random initial velocity
-        angle := rand.Float64() * 2 * math.Pi
-        speed := rand.Float64()*(maxSpeed-minSpeed) + minSpeed
-        velX := speed * math.Cos(angle)
-        velY := speed * math.Sin(angle)
-
-        // Create a circle for the molecule
-        var circle *canvas.Circle
-        var isCharged bool
-
-        if i == 0 {
-            // First molecule is the charged particle
-            circle = canvas.NewCircle(chargedColor) // Use chargedColor variable
-            isCharged = true
-        } else {
-            circle = canvas.NewCircle(moleculesColor) // Use moleculesColor variable
-            isCharged = false
-        }
-
-        circle.Resize(fyne.NewSize(moleculeSize, moleculeSize))
-        circle.Move(fyne.NewPos(float32(posX), float32(posY)))
-
-        // Add to container
-        moleculeContainer.Add(circle)
-
-        // Add to molecule slice
-        molecule := &Molecule{
-            circle:    circle,
-            posX:      posX,
-            posY:      posY,
-            velX:      velX,
-            velY:      velY,
-            isCharged: isCharged,
-        }
-        molecules = append(molecules, molecule)
-    }
+    // Initialize molecules after the window and content have been set
+    molecules := initializeMolecules(moleculeContainer)
 
     // Initial temperature value
     var previousTemperature = 300.0 // Initial temperature value
@@ -164,28 +91,6 @@ func main() {
         electricFieldLabel,
         electricFieldSliderContainer,
     )
-
-    // Update temperature label and adjust velocities when slider changes
-    temperatureSlider.OnChanged = func(value float64) {
-        temperatureLabel.SetText("Temperature: " + fmt.Sprintf("%.1f", value) + "K")
-
-        // Calculate the scaling factor
-        scalingFactor := math.Sqrt(value / previousTemperature)
-
-        // Adjust velocities of all molecules
-        for _, m := range molecules {
-            m.velX *= scalingFactor
-            m.velY *= scalingFactor
-        }
-
-        // Update the previous temperature
-        previousTemperature = value
-    }
-
-    // Update electric field label when slider changes
-    electricFieldSlider.OnChanged = func(value float64) {
-        electricFieldLabel.SetText("Electric Field: " + fmt.Sprintf("%.1f", value))
-    }
 
     // Controls container
     controls := container.NewVBox(
@@ -264,7 +169,110 @@ func main() {
         }
     }()
 
+    // Update temperature label and adjust velocities when slider changes
+    temperatureSlider.OnChanged = func(value float64) {
+        temperatureLabel.SetText("Temperature: " + fmt.Sprintf("%.1f", value) + "K")
+
+        // Calculate the scaling factor
+        scalingFactor := math.Sqrt(value / previousTemperature)
+
+        // Adjust velocities of all molecules
+        for _, m := range molecules {
+            m.velX *= scalingFactor
+            m.velY *= scalingFactor
+        }
+
+        // Update the previous temperature
+        previousTemperature = value
+    }
+
+    // Update electric field label when slider changes
+    electricFieldSlider.OnChanged = func(value float64) {
+        electricFieldLabel.SetText("Electric Field: " + fmt.Sprintf("%.1f", value))
+    }
+
     myWindow.ShowAndRun()
+}
+
+// Initialize molecules function
+func initializeMolecules(moleculeContainer *fyne.Container) []*Molecule {
+
+    molecules := make([]*Molecule, 0, moleculesCount)
+    minDistance := 2.0 * float64(moleculeSize)
+
+    for i := 0; i < moleculesCount; i++ {
+        var posX, posY float64
+        maxAttempts := 1000
+        attempts := 0
+
+        // Loop to find a valid position
+        for {
+            // Random initial position
+            posX = rand.Float64()*(windowWidth-moleculeSize*2) + moleculeSize
+            posY = rand.Float64()*(windowHeight-moleculeSize*2) + moleculeSize
+
+            validPosition := true
+
+            // Check against all previously placed molecules
+            for _, m := range molecules {
+                dx := posX - m.posX
+                dy := posY - m.posY
+                distance := math.Sqrt(dx*dx + dy*dy)
+                if distance < minDistance {
+                    validPosition = false
+                    break
+                }
+            }
+
+            if validPosition {
+                break
+            }
+
+            attempts++
+            if attempts >= maxAttempts {
+                fmt.Println("Warning: Max attempts reached while placing molecule", i)
+                break
+            }
+        }
+
+        // Random initial velocity
+        angle := rand.Float64() * 2 * math.Pi
+        speed := rand.Float64()*(maxSpeed-minSpeed) + minSpeed
+        velX := speed * math.Cos(angle)
+        velY := speed * math.Sin(angle)
+
+        // Create a circle for the molecule
+        var circle *canvas.Circle
+        var isCharged bool
+
+        if i == 0 {
+            // First molecule is the charged particle
+            circle = canvas.NewCircle(chargedColor) // Use chargedColor variable
+            isCharged = true
+        } else {
+            circle = canvas.NewCircle(moleculesColor) // Use moleculesColor variable
+            isCharged = false
+        }
+
+        circle.Resize(fyne.NewSize(moleculeSize, moleculeSize))
+        circle.Move(fyne.NewPos(float32(posX), float32(posY)))
+
+        // Add to container
+        moleculeContainer.Add(circle)
+
+        // Add to molecule slice
+        molecule := &Molecule{
+            circle:    circle,
+            posX:      posX,
+            posY:      posY,
+            velX:      velX,
+            velY:      velY,
+            isCharged: isCharged,
+        }
+        molecules = append(molecules, molecule)
+    }
+
+    return molecules
 }
 
 // Function to check if two molecules are colliding
