@@ -15,7 +15,7 @@ import (
 )
 
 const (
-    moleculeCount = 100
+    moleculesCount = 100
     windowWidth   = 800
     windowHeight  = 600
     moleculeSize  = 8
@@ -43,8 +43,8 @@ func main() {
     moleculeContainer := container.NewWithoutLayout()
 
     // Initialize molecules
-    molecules := make([]*Molecule, moleculeCount)
-    for i := 0; i < moleculeCount; i++ {
+    molecules := make([]*Molecule, moleculesCount)
+    for i := 0; i < moleculesCount; i++ {
         // Random initial position avoiding overlap
         posX := rand.Float64()*(windowWidth-moleculeSize*2) + moleculeSize
         posY := rand.Float64()*(windowHeight-moleculeSize*2) + moleculeSize
@@ -92,7 +92,7 @@ func main() {
         defer ticker.Stop()
         for range ticker.C {
             // Update molecule positions and velocities
-            for i := 0; i < moleculeCount; i++ {
+            for i := 0; i < moleculesCount; i++ {
                 m1 := molecules[i]
 
                 // Adjust velocity based on temperature
@@ -127,7 +127,7 @@ func main() {
                 }
 
                 // Check for collisions with other molecules
-                for j := i + 1; j < moleculeCount; j++ {
+                for j := i + 1; j < moleculesCount; j++ {
                     m2 := molecules[j]
                     if isColliding(m1, m2) {
                         // Elastic collision response
