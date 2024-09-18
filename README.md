@@ -113,5 +113,5 @@ Contributions are welcome! Please open issues or submit pull requests for improv
 
 ## Contact
 
-For questions or suggestions, please contact [your.email@example.com](mailto:your.email@example.com).
+For questions or suggestions, please contact here or PM in Linkedin (see profile).
 
