@@ -179,7 +179,7 @@ func main() {
                 if m1.isCharged && electricYFieldSlider.Value != 0 {
                     // ElectricY field applies a force in the Y-direction
                     electricYForce := electricYFieldSlider.Value * 0.1 // Adjust the multiplier as needed
-                    m1.velY += electricYForce
+                    m1.velY -= electricYForce
                 }
 
 
