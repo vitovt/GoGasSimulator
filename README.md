@@ -13,15 +13,18 @@ A visual simulation of ideal gas molecules with temperature and electric field c
 - **100 Ideal Gas Molecules**: Simulates the movement and interaction of 100 gas molecules.
 - **Temperature Control**: Adjust the temperature to see how it affects the speed of the molecules.
 - **Electric Field Control**: Apply an external electric field that influences a specific charged particle.
+- **Electric Field Direction**: Set direction for external electric field, separately for X and Y component.
 - **Charged Particle**: A distinguishable molecule affected by the electric field, represented in a different color.
 - **Elastic Collisions**: Molecules collide elastically with each other and the container walls.
 - **User-Friendly Interface**: Built with Fyne, offering a clean and responsive GUI.
+- **Gravitation Field Control**: Apply an external gravitation field that influences to all particles.
 
 ## Screenshots
 
 Screenshots are located in the `screenshots` directory.
 
-... todo ...
+![Electrical field force](screenshots/ElectricField.png)
+![Gravitation force](screenshots/Gravity.png)
 
 ## Installation
 
