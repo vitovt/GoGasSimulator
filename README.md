@@ -68,7 +68,7 @@ go get fyne.io/fyne/v2/cmd/fyne
 or
 
 ```bash
-go mod GoGasSimulator
+go mod init GoGasSimulator
 go mod tidy
 ```
 
