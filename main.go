@@ -16,13 +16,17 @@ import (
 )
 
 // Constants and Variables
+const (
+    defaultTemperature = 300.0
+    moleculeSize   = 8.0
+    minSpeed       = 1.0
+    maxSpeed       = 5.0
+)
+
 var (
     moleculesCount = 100
     windowWidth  = 800.0
     windowHeight  = 600.0 
-    moleculeSize  = 8.0
-    minSpeed      = 1.0
-    maxSpeed      = 5.0
 )
 
 var (
@@ -57,7 +61,7 @@ func main() {
     moleculeContainer.Add(border)
 
     // Initial temperature value
-    var previousTemperature = 300.0 // Initial temperature value
+    var previousTemperature = defaultTemperature // Initial temperature value
 
     // Temperature slider
     temperatureSlider := widget.NewSlider(2, 1000)
@@ -128,19 +132,19 @@ func main() {
     // Create the Reset button
     resetButton := widget.NewButton("Reset", func() {
         // Reset sliders to default values
-        temperatureSlider.SetValue(300.0)
+        temperatureSlider.SetValue(defaultTemperature)
         gravitySlider.SetValue(0)
         electricXFieldSlider.SetValue(0)
         electricYFieldSlider.SetValue(0)
 
         // Reset labels
-        temperatureLabel.SetText("Temperature: 300.0K")
+        temperatureLabel.SetText("Temperature: "  + fmt.Sprintf("%.1f", defaultTemperature) + "K")
         gravityLabel.SetText("Gravity: 0.0g")
         electricXFieldLabel.SetText("ElectricX Field: 0.0")
         electricYFieldLabel.SetText("ElectricY Field: 0.0")
 
         // Reset previousTemperature
-        previousTemperature = 300.0
+        previousTemperature = defaultTemperature
 
         // Reset molecule velocities
         for _, m := range molecules {
