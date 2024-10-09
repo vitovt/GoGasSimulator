@@ -6,6 +6,8 @@ import (
     "math"
     "math/rand"
     "time"
+    "strconv"
+    "errors"
 
     "fyne.io/fyne/v2"
     "fyne.io/fyne/v2/app"
@@ -24,7 +26,8 @@ const (
 )
 
 var (
-    moleculesCount = 100
+    moleculesCountDefault = 100
+    moleculesCount = moleculesCountDefault
     windowWidth  = 800.0
     windowHeight  = 600.0 
     separateMolecules = false
@@ -165,6 +168,7 @@ func main() {
             moleculeContainer.Remove(m.circle)
         }
 
+        moleculesCount = moleculesCountDefault
         // Reinitialize molecules
         molecules = initializeMolecules(moleculeContainer, temperatureSlider.Value)
     })
@@ -173,6 +177,32 @@ func main() {
     divideCheckbox := widget.NewCheck("", func(checked bool) {
         separateMolecules = checked
     })
+
+    // Create a numeric entry for molecules count
+    moleculesCountLabel := widget.NewLabel("Molecules Count")
+    moleculesCountEntry := widget.NewEntry()
+    moleculesCountEntry.SetPlaceHolder("Enter a value between 10 and 5000")
+    moleculesCountEntry.Text = strconv.Itoa(moleculesCount) // Set initial value
+
+    // Make sure the entry only accepts numeric input and respects range 10-5000
+    moleculesCountEntry.Validator = func(input string) error {
+        if input == "" {
+            return nil // Allow empty input for editing
+        }
+        value, err := strconv.Atoi(input)
+        if err != nil {
+            return err // Invalid number
+        }
+        if value < 10 || value > 1000 {
+            return errors.New("Invalid Input, Please enter a value between 10 and 1000")
+        }
+        return nil
+    }
+    moleculesCountEntry.OnChanged = func(input string) {
+        if value, err := strconv.Atoi(input); err == nil && value >= 10 && value <= 1000 {
+            moleculesCountDefault = value
+        }
+    }
 
     // Arrange labels and sliders on the same line
     topControl := container.NewHBox(
@@ -188,8 +218,8 @@ func main() {
         electricXFieldSliderContainer,
         electricYFieldLabel,
         electricYFieldSliderContainer,
-        divideLabel,
-        divideCheckbox,
+        container.NewHBox(divideLabel, divideCheckbox),
+        container.NewHBox(moleculesCountLabel, moleculesCountEntry),
     )
 
     // Controls container
