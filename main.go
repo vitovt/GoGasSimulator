@@ -27,11 +27,13 @@ var (
     moleculesCount = 100
     windowWidth  = 800.0
     windowHeight  = 600.0 
+    separateMolecules = false
 )
 
 var (
     moleculesColor = color.NRGBA{R: 0, G: 0, B: 255, A: 255} // Blue color for uncharged molecules
     chargedColor   = color.NRGBA{R: 255, G: 0, B: 0, A: 255} // Red color for the charged particle
+    differentColor = color.NRGBA{R: 0, G: 255, B: 0, A: 255}   // Green color for the other particle
 )
 
 type Molecule struct {
@@ -167,6 +169,11 @@ func main() {
         molecules = initializeMolecules(moleculeContainer, temperatureSlider.Value)
     })
 
+    divideLabel := widget.NewLabel("Separate")
+    divideCheckbox := widget.NewCheck("", func(checked bool) {
+        separateMolecules = checked
+    })
+
     // Arrange labels and sliders on the same line
     topControl := container.NewHBox(
         temperatureLabel,
@@ -181,6 +188,8 @@ func main() {
         electricXFieldSliderContainer,
         electricYFieldLabel,
         electricYFieldSliderContainer,
+        divideLabel,
+        divideCheckbox,
     )
 
     // Controls container
@@ -246,7 +255,6 @@ func main() {
                     electricYForce := electricYFieldSlider.Value * 0.1 // Adjust the multiplier as needed
                     m1.velY -= electricYForce
                 }
-
 
                 // Apply gravity field force to all particles
                 if gravitySlider.Value != 0 {
@@ -349,7 +357,15 @@ func initializeMolecules(moleculeContainer *fyne.Container, temperature float64)
         // Loop to find a valid position
         for {
             // Random initial position
-            posX = rand.Float64()*(windowWidth-moleculeSize*2) + moleculeSize
+            if separateMolecules {
+                if i%2 == 1 {
+                    posX = rand.Float64()*(windowWidth/2-moleculeSize*2) + moleculeSize
+                } else {
+                    posX = rand.Float64()*(windowWidth/2-moleculeSize*2) + moleculeSize + windowWidth/2
+                }
+            } else {
+                posX = rand.Float64()*(windowWidth-moleculeSize*2) + moleculeSize
+            }
             posY = rand.Float64()*(windowHeight-moleculeSize*2) + moleculeSize
 
             validPosition := true
@@ -394,6 +410,10 @@ func initializeMolecules(moleculeContainer *fyne.Container, temperature float64)
         } else {
             circle = canvas.NewCircle(moleculesColor) // Use moleculesColor variable
             isCharged = false
+        }
+
+        if separateMolecules && i%2 == 1 {
+            circle = canvas.NewCircle(differentColor) // Use differentColor
         }
 
         circle.Resize(fyne.NewSize(float32(moleculeSize), float32(moleculeSize)))
