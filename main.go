@@ -23,6 +23,7 @@ const (
     moleculeSize   = 8.0
     minSpeed       = 1.0
     maxSpeed       = 5.0
+    maxMolecules   = 5000
 )
 
 var (
@@ -31,6 +32,7 @@ var (
     windowWidth  = 800.0
     windowHeight  = 600.0 
     separateMolecules = false
+    isReinitializing = false
 )
 
 var (
@@ -168,6 +170,7 @@ func main() {
             moleculeContainer.Remove(m.circle)
         }
 
+        isReinitializing = true
         moleculesCount = moleculesCountDefault
         // Reinitialize molecules
         molecules = initializeMolecules(moleculeContainer, temperatureSlider.Value)
@@ -179,7 +182,7 @@ func main() {
     })
 
     // Create a numeric entry for molecules count
-    moleculesCountLabel := widget.NewLabel("Molecules Count")
+    moleculesCountLabel := widget.NewLabel("Molecules No")
     moleculesCountEntry := widget.NewEntry()
     moleculesCountEntry.SetPlaceHolder("Enter a value between 10 and 5000")
     moleculesCountEntry.Text = strconv.Itoa(moleculesCount) // Set initial value
@@ -193,13 +196,13 @@ func main() {
         if err != nil {
             return err // Invalid number
         }
-        if value < 10 || value > 1000 {
-            return errors.New("Invalid Input, Please enter a value between 10 and 1000")
+        if value < 10 || value > maxMolecules {
+            return errors.New("Invalid Input, Please enter a value between 10 and " + strconv.Itoa(maxMolecules))
         }
         return nil
     }
     moleculesCountEntry.OnChanged = func(input string) {
-        if value, err := strconv.Atoi(input); err == nil && value >= 10 && value <= 1000 {
+        if value, err := strconv.Atoi(input); err == nil && value >= 10 && value <= maxMolecules {
             moleculesCountDefault = value
         }
     }
@@ -259,6 +262,9 @@ func main() {
         ticker := time.NewTicker(16 * time.Millisecond) // Approximately 60 FPS
         defer ticker.Stop()
         for range ticker.C {
+            if isReinitializing == true {
+                continue // Skip if molecules are being reinitialized
+            }
             // Update windowWidth and windowHeight based on moleculeContainer size
             windowWidth = float64(moleculeContainer.Size().Width)
             windowHeight = float64(moleculeContainer.Size().Height)
@@ -463,6 +469,7 @@ func initializeMolecules(moleculeContainer *fyne.Container, temperature float64)
         }
         molecules = append(molecules, molecule)
     }
+    isReinitializing = false
 
     return molecules
 }
