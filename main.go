@@ -63,6 +63,9 @@ func main() {
     // Initial temperature value
     var previousTemperature = defaultTemperature // Initial temperature value
 
+    // Declare molecules variable at a higher scope
+    var molecules []*Molecule
+
     // Temperature slider
     temperatureSlider := widget.NewSlider(2, 1000)
     temperatureSlider.Value = previousTemperature
@@ -126,9 +129,6 @@ func main() {
         electricYFieldSlider,
     )
 
-    // Initialize molecules after the window and content have been set
-    molecules := initializeMolecules(moleculeContainer)
-
     // Create the Reset button
     resetButton := widget.NewButton("Reset", func() {
         // Reset sliders to default values
@@ -156,6 +156,17 @@ func main() {
         }
     })
 
+    // Create the Restart button
+    restartButton := widget.NewButton("Restart", func() {
+        // Remove existing molecule circles from moleculeContainer
+        for _, m := range molecules {
+            moleculeContainer.Remove(m.circle)
+        }
+
+        // Reinitialize molecules
+        molecules = initializeMolecules(moleculeContainer, temperatureSlider.Value)
+    })
+
     // Arrange labels and sliders on the same line
     topControl := container.NewHBox(
         temperatureLabel,
@@ -163,6 +174,7 @@ func main() {
         gravityLabel,
         gravitySliderContainer,
         resetButton,
+        restartButton,
     )
     bottomControl := container.NewHBox(
         electricXFieldLabel,
@@ -191,6 +203,8 @@ func main() {
     // Adjust window size to accommodate controls and molecule area
     myWindow.Resize(fyne.NewSize(float32(windowWidth), float32(windowHeight+100)))
 
+    // Initialize molecules after the window and content have been set
+    molecules = initializeMolecules(moleculeContainer, temperatureSlider.Value)
     // Handle window resize events
     myWindow.Canvas().SetOnTypedKey(func(event *fyne.KeyEvent) {
         // Optional: Handle keyboard events if needed
@@ -322,7 +336,7 @@ func main() {
 }
 
 // Initialize molecules function
-func initializeMolecules(moleculeContainer *fyne.Container) []*Molecule {
+func initializeMolecules(moleculeContainer *fyne.Container, temperature float64) []*Molecule {
     // Get the initial size of the molecule container
     molecules := make([]*Molecule, 0, moleculesCount)
     minDistance := 2.0 * float64(moleculeSize)
@@ -365,6 +379,7 @@ func initializeMolecules(moleculeContainer *fyne.Container) []*Molecule {
         // Random initial velocity
         angle := rand.Float64() * 2 * math.Pi
         speed := rand.Float64()*(maxSpeed-minSpeed) + minSpeed
+        speed = speed * temperature/defaultTemperature
         velX := speed * math.Cos(angle)
         velY := speed * math.Sin(angle)
 
