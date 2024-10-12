@@ -33,7 +33,9 @@ Screenshots are located in the `screenshots` directory.
 - **Go 1.19 or newer**: [Download Go](https://golang.org/dl/)
 - **Fyne Toolkit**: Install the Fyne GUI toolkit for Go.
 
-### Install Go
+### Setting up Go and Fyne
+
+#### Install Go
 
 Ensure Go is installed:
 
@@ -49,7 +51,7 @@ sudo add-apt-repository ppa:longsleep/golang-backports
 sudo apt install golang-go
 ```
 
-### Install Fyne Dependencies
+#### Install Fyne Dependencies
 
 For **Linux Ubuntu/Kubuntu**:
 
@@ -75,26 +77,53 @@ go mod tidy
 
 ## Building and Running the Application
 
-### Clone the Repository
+### Using Makefile (Recommended)
 
-```bash
-git clone https://github.com/yourusername/GoGasSimulator.git
-cd GoGasSimulator
-```
+1. **Clone the Repository**
+   ```bash
+   git clone https://github.com/vitovt/GoGasSimulator.git
+   cd GoGasSimulator
+   ```
 
-### Build the Application
+2. **Build the Application**
+   - To build for the current operating system:
+     ```bash
+     make build
+     ```
+  - To clean up build artifacts:
+     ```bash
+     make clean
+     ```
+   - To show all available options:
+     ```bash
+     make help
+     ```
+   - To show all environment variables which can be overrided:
+     ```bash
+     make info
+     ```
+ 
+### Manual Build (Without Makefile)
 
-```bash
-go build -o GoGasSimulator
-```
+If you prefer not to use the Makefile, you can manually build the application using the following commands.
 
-### Run the Application
+1. **Clone the Repository**
+   ```bash
+   git clone https://github.com/vitovt/GoGasSimulator.git
+   cd GoGasSimulator
+   ```
 
-```bash
-./GoGasSimulator
-```
+2. **Build the Application**
+   ```bash
+   go build -o GoGasSimulator
+   ```
 
-Alternatively, you can run it directly:
+3. **Run the Application**
+   ```bash
+   ./GoGasSimulator
+   ```
+
+Or run it directly:
 
 ```bash
 go run main.go
