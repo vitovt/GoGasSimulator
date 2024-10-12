@@ -33,6 +33,6 @@ RUN go build -o /app/app.exe main.go
 
 # Final stage to extract the binary
 FROM scratch AS export-stage
-ARG APP_NAME
+ARG APP_NAME="GoGasSimulator_windows"
 COPY --from=builder /app/app.exe /${APP_NAME}.exe
 

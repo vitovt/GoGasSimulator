@@ -36,6 +36,6 @@ RUN go build -o /app/app_linux main.go
 
 # Final stage to extract the binary
 FROM scratch AS export-stage
-ARG APP_NAME
+ARG APP_NAME="GoGasSimulator_linux"
 COPY --from=builder /app/app_linux /${APP_NAME}
 
