@@ -33,7 +33,7 @@ MAIN_FILE := main.go
 # Ensure the OUTPUT_DIR exists
 
 # Phony targets to ensure Make doesn't confuse them with files
-.PHONY: all build build-linux build-mac build-windows build-all clean prepare help format lint recreate-mod test info
+.PHONY: all build build-linux build-mac build-windows build-all clean prepare help format lint recreate-mod test info build-docker-windows build-docker-linux
 
 help:
 	@echo "Makefile for $(APP_NAME) - Go application"
@@ -48,6 +48,11 @@ help:
 	@echo "  build-windows : Build Windows binary"
 	@echo "  build-linux   : Build Linux binary"
 	@echo "  build-mac     : Build macOS binary (Not tested)"
+	@echo ""
+	@echo "Docker Build Targets:"
+	@echo "(simple building executables inside docker containers for Lin and Win)"
+	@echo "  build-docker-windows : Build Windows binary using Docker"
+	@echo "  build-docker-linux   : Build Linux binary using Docker"
 	@echo ""
 	@echo "Helpers:"
 	@echo "  prepare     : Download and install dependencies"
@@ -114,6 +119,16 @@ build-windows: prepare
 	@echo "Building for Windows..."
 	@GOOS=windows GOARCH=$(GOARCH) go build -ldflags "-X main.Version=$(VERSION)" -o $(OUTPUT_DIR)/$(APP_NAME)-$(VERSION)_windows_$(GOARCH).exe $(MAIN_FILE)
 	@echo "Windows build completed: $(OUTPUT_DIR)/$(APP_NAME)-$(VERSION)_windows_$(GOARCH).exe"
+
+build-docker-windows:
+	@echo "Building Windows binary in Docker..."
+	@DOCKER_BUILDKIT=1 docker build --build-arg APP_NAME=$(APP_NAME)-$(VERSION)_windows_$(GOARCH) -f Dockerfile.windows --output type=local,dest=./$(OUTPUT_DIR) .
+	@echo "Windows Docker build completed: $(OUTPUT_DIR)/$(APP_NAME)-$(VERSION)_windows_$(GOARCH).exe"
+
+build-docker-linux:
+	@echo "Building Linux binary in Docker..."
+	@DOCKER_BUILDKIT=1 docker build --build-arg APP_NAME=$(APP_NAME)-$(VERSION)_linux_$(GOARCH) -f Dockerfile.linux --output type=local,dest=./$(OUTPUT_DIR) .
+	@echo "Linux Docker build completed: $(OUTPUT_DIR)/$(APP_NAME)-$(VERSION)_linux_$(GOARCH)"
 
 # Build for all platforms
 build-all: prepare build-linux build-mac build-windows

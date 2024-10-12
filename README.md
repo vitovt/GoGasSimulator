@@ -102,10 +102,40 @@ go mod tidy
      ```bash
      make info
      ```
- 
+
+### Building with Docker (No Local Setup Required)
+If you don't want to set up a local Go build environment, you can use Docker to compile the application. This allows you to build for both Windows and Linux without installing Go or other dependencies locally.
+
+1. **Clone the Repository**
+   ```bash
+   git clone https://github.com/vitovt/GoGasSimulator.git
+   cd GoGasSimulator
+   ```
+
+2. **Building for Windows** inside a Docker container:
+   ```bash
+   make build-docker-windows
+   ```
+
+3. **Building for Linux** inside a Docker container:
+   ```bash
+   make build-docker-linux
+   ```
+
+These commands will use Docker to compile the application in a container and output the executable to the local `./bin` directory.
+
+#### Explanation of Preferences for Docker-Based Builds
+
+Building inside Docker containers offers several advantages:
+1. **No Local Setup Required**: There's no need to install Go, Fyne, or any other dependencies on your local machine. All dependencies are handled within the Docker container.
+2. **Consistent Build Environment**: By using Docker, you ensure that the application is compiled in a consistent environment, avoiding issues caused by differences in local setups.
+3. **Cross-Platform Compatibility**: The Docker-based builds allow you to easily cross-compile for different platforms (Linux and Windows) without needing to set up each environment individually.
+
+By running the `make build-docker-windows` or `make build-docker-linux` commands, the application is built in a container and the resulting executable is placed in the `./bin` directory, ready for use. This simplifies the process and avoids potential configuration issues on the host machine.
+
 ### Manual Build (Without Makefile)
 
-If you prefer not to use the Makefile, you can manually build the application using the following commands.
+If you'd prefer not to use the Makefile or Docker, you can still manually build the application as described below.
 
 1. **Clone the Repository**
    ```bash
