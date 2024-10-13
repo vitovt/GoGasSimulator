@@ -1,8 +1,9 @@
 # GoGasSimulator
 
 A visual simulation of ideal gas molecules with temperature and electric field controls, built in Go using the Fyne GUI toolkit.
-
-![Simulation Screenshot](screenshots/GoGasSimulator.png)|![Two gases simulation](screenshots/separate_gases.png)
+Main Simulation Screenshot             |  Separate Gases
+:-------------------------:|:-------------------------:
+![Simulation Screenshot](screenshots/GoGasSimulator.png) | ![Two gases simulation](screenshots/separate_gases.png)
 
 ## Overview
 
