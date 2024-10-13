@@ -58,6 +58,10 @@ help:
 	@echo "  lin-dep-ubuntu       : Install local dependencies for Linux build on Ubuntu"
 	@echo "  win-dep-ubuntu       : Install local dependencies for Windows build on Ubuntu"
 	@echo ""
+	@echo "Release Targets:"
+	@echo "  release              : Create a new GitHub release with the built binaries"
+	@echo "                        (Requires 'gh' CLI tool and 'gh auth login' for authentication)"
+	@echo ""
 	@echo "Helpers:"
 	@echo "  prepare     : Download and install dependencies"
 	@echo "  format      : Format the source code"
@@ -154,6 +158,16 @@ build-docker-linux:
 # Build for all platforms
 build-all: prepare build-linux build-windows #build-mac
 	@echo "All builds completed successfully!"
+
+# Release target that creates a GitHub release and uploads binaries
+release: build-all
+	@echo "Creating GitHub release for version $(VERSION)..."
+	gh release create $(VERSION) \
+		--title "Release $(VERSION)" \
+		--notes "Semi-automated release for version $(VERSION)" \
+		$(OUTPUT_DIR)/$(APP_NAME)-$(VERSION)_linux_$(GOARCH) \
+		$(OUTPUT_DIR)/$(APP_NAME)-$(VERSION)_windows_$(GOARCH).exe
+	@echo "Release $(VERSION) created successfully."
 
 # Clean compiled binaries
 clean:
