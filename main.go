@@ -6,6 +6,7 @@ import (
     "math"
     "math/rand"
     "time"
+    "flag"
 
     "fyne.io/fyne/v2"
     "fyne.io/fyne/v2/app"
@@ -17,17 +18,17 @@ import (
 
 // Constants and Variables
 const (
-    defaultTemperature = 300.0
-    moleculeSize   = 8.0
-    minSpeed       = 1.0
-    maxSpeed       = 5.0
 )
 
 var (
+    moleculeSize   = 8.0
+    minSpeed       = 1.0
+    maxSpeed       = 5.0
     moleculesCount = 100
     windowWidth  = 800.0
     windowHeight  = 600.0 
     separateMolecules = false
+    defaultTemperature = 300.0
 )
 
 var (
@@ -43,6 +44,21 @@ type Molecule struct {
     velX      float64
     velY      float64
     isCharged bool
+}
+
+func init() {
+    // Define command line flags
+    flag.Float64Var(&moleculeSize, "moleculeSize", moleculeSize, "Size of each molecule")
+    flag.Float64Var(&minSpeed, "minSpeed", minSpeed, "Minimum speed of molecules")
+    flag.Float64Var(&maxSpeed, "maxSpeed", maxSpeed, "Maximum speed of molecules")
+    flag.IntVar(&moleculesCount, "moleculesCount", moleculesCount, "Number of molecules")
+    flag.Float64Var(&windowWidth, "windowWidth", windowWidth, "Width of the simulation window")
+    flag.Float64Var(&windowHeight, "windowHeight", windowHeight, "Height of the simulation window")
+    flag.BoolVar(&separateMolecules, "separateMolecules", separateMolecules, fmt.Sprintf("Whether to separate molecules initially (default: %t)", separateMolecules))
+    flag.Float64Var(&defaultTemperature, "defaultTemperature", defaultTemperature, "Start temperature of molecules")
+
+    // Parse command line flags
+    flag.Parse()
 }
 
 func main() {
@@ -173,6 +189,7 @@ func main() {
     divideCheckbox := widget.NewCheck("", func(checked bool) {
         separateMolecules = checked
     })
+    divideCheckbox.SetChecked(separateMolecules)
 
     // Arrange labels and sliders on the same line
     topControl := container.NewHBox(
