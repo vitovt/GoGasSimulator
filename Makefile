@@ -54,6 +54,10 @@ help:
 	@echo "  build-docker-windows : Build Windows binary using Docker"
 	@echo "  build-docker-linux   : Build Linux binary using Docker"
 	@echo ""
+	@echo "Dependency Installation:"
+	@echo "  lin-dep-ubuntu       : Install local dependencies for Linux build on Ubuntu"
+	@echo "  win-dep-ubuntu       : Install local dependencies for Windows build on Ubuntu"
+	@echo ""
 	@echo "Helpers:"
 	@echo "  prepare     : Download and install dependencies"
 	@echo "  format      : Format the source code"
@@ -86,6 +90,23 @@ prepare:
 	@echo "Downloading dependencies..."
 	@go mod download
 	@echo "Dependencies downloaded."
+
+# Install local dependencies for linux build
+lin-dep-ubuntu:
+	@sudo apt-get update && sudo apt-get install \
+        libgl1-mesa-dev \
+	libx11-dev \
+        xorg-dev \
+        libxcursor-dev \
+        libxrandr-dev \
+        libxinerama-dev \
+        libxi-dev \
+        libglu1-mesa-dev \
+        pkg-config
+
+# Install local dependencies for windows build
+win-dep-ubuntu:
+	@sudo apt-get update && sudo apt-get install -y gcc-mingw-w64-x86-64 libgl1-mesa-dev xorg-dev libgtk-3-dev 
 
 # Build for the current architecture
 build: prepare
