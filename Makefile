@@ -117,7 +117,7 @@ build-mac: prepare
 # Build for Windows
 build-windows: prepare
 	@echo "Building for Windows..."
-	@GOOS=windows GOARCH=$(GOARCH) go build -ldflags "-X main.Version=$(VERSION)" -o $(OUTPUT_DIR)/$(APP_NAME)-$(VERSION)_windows_$(GOARCH).exe $(MAIN_FILE)
+	@GOOS=windows GOARCH=$(GOARCH) CGO_ENABLED=1 CC="x86_64-w64-mingw32-gcc" CXX="x86_64-w64-mingw32-g++" go build -ldflags "-X main.Version=$(VERSION)" -o $(OUTPUT_DIR)/$(APP_NAME)-$(VERSION)_windows_$(GOARCH).exe $(MAIN_FILE)
 	@echo "Windows build completed: $(OUTPUT_DIR)/$(APP_NAME)-$(VERSION)_windows_$(GOARCH).exe"
 
 build-docker-windows:
@@ -131,7 +131,7 @@ build-docker-linux:
 	@echo "Linux Docker build completed: $(OUTPUT_DIR)/$(APP_NAME)-$(VERSION)_linux_$(GOARCH)"
 
 # Build for all platforms
-build-all: prepare build-linux build-mac build-windows
+build-all: prepare build-linux build-windows #build-mac
 	@echo "All builds completed successfully!"
 
 # Clean compiled binaries
