@@ -26,6 +26,29 @@ Screenshots are located in the `screenshots` directory.
 ![Electrical field force](screenshots/ElectricField.png)
 ![Gravitation force](screenshots/Gravity.png)
 
+## Usage
+
+### GUI
+- **Temperature Slider**: Move the slider to increase or decrease the temperature, affecting molecule speeds.
+- **Electric Field Slider**: Adjust the slider to apply an electric field, influencing the charged particle.
+- **Separate** checkbox: divides molecules on two sorts with different colors (works after pressing Restart)
+- **Reset** button: resets values of sliders to default
+- **Restart** button: restarts simulation with reposition of molecules and reassigning initial speeds
+- **Observation**: Watch the molecules interact and observe the effects of temperature and electric field changes.
+
+### CLI
+
+You can ovveride default values of simulation buy cli optins.
+For example:
+```
+./GoGasSimulator --separateMolecules=true --moleculeSize=4 --moleculesCount=700 --defaultTemperature=400
+```
+
+You can check all of them with --help option:
+```
+./GoGasSimulator --help
+```
+
 ## Installation
 
 ### Prerequisites
@@ -158,12 +181,6 @@ Or run it directly:
 ```bash
 go run main.go
 ```
-
-## Usage
-
-- **Temperature Slider**: Move the slider to increase or decrease the temperature, affecting molecule speeds.
-- **Electric Field Slider**: Adjust the slider to apply an electric field, influencing the charged particle.
-- **Observation**: Watch the molecules interact and observe the effects of temperature and electric field changes.
 
 ## License
 
