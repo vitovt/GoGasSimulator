@@ -2,7 +2,7 @@
 
 A visual simulation of ideal gas molecules with temperature and electric field controls, built in Go using the Fyne GUI toolkit.
 
-![Simulation Screenshot](screenshots/GoGasSimulator.png)
+![Simulation Screenshot](screenshots/GoGasSimulator.png)|![Two gases simulation](screenshots/separate_gases.png)
 
 ## Overview
 
@@ -23,8 +23,9 @@ A visual simulation of ideal gas molecules with temperature and electric field c
 
 Screenshots are located in the `screenshots` directory.
 
-![Electrical field force](screenshots/ElectricField.png)
-![Gravitation force](screenshots/Gravity.png)
+Electrical field force             |  Gravity field force
+:-------------------------:|:-------------------------:
+![Electrical field force](screenshots/ElectricField.png) | ![Gravitation force](screenshots/Gravity.png)
 
 ## Usage
 
