@@ -19,6 +19,7 @@ Main Simulation Screenshot             |  Separate Gases
 - **Elastic Collisions**: Molecules collide elastically with each other and the container walls.
 - **User-Friendly Interface**: Built with Fyne, offering a clean and responsive GUI.
 - **Gravitation Field Control**: Apply an external gravitation field that influences to all particles.
+- **Adhesion control**: Make flor adhesive for molecules.
 
 ## Screenshots
 
@@ -37,13 +38,14 @@ Electrical field force             |  Gravity field force
 - **Reset** button: resets values of sliders to default
 - **Restart** button: restarts simulation with reposition of molecules and reassigning initial speeds
 - **Observation**: Watch the molecules interact and observe the effects of temperature and electric field changes.
+- **Adhesion**: Enable molecules sticking to the floor.
 
 ### CLI
 
 You can ovveride default values of simulation buy cli optins.
 For example:
 ```
-./GoGasSimulator --separateMolecules=true --moleculeSize=4 --moleculesCount=700 --defaultTemperature=400
+./GoGasSimulator --separateMolecules=true --moleculeSize=4 --moleculesCount=700 --defaultTemperature=400 --adhesionMolecules=true
 ```
 
 You can check all of them with --help option:

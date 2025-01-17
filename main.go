@@ -27,6 +27,7 @@ var (
 	windowWidth        = 800.0
 	windowHeight       = 600.0
 	separateMolecules  = false
+	adhesionMolecules  = false
 	defaultTemperature = 300.0
 )
 
@@ -43,6 +44,7 @@ type Molecule struct {
 	velX      float64
 	velY      float64
 	isCharged bool
+	isStuck   bool
 }
 
 func init() {
@@ -54,6 +56,7 @@ func init() {
 	flag.Float64Var(&windowWidth, "windowWidth", windowWidth, "Width of the simulation window")
 	flag.Float64Var(&windowHeight, "windowHeight", windowHeight, "Height of the simulation window")
 	flag.BoolVar(&separateMolecules, "separateMolecules", separateMolecules, fmt.Sprintf("Whether to separate molecules initially (default: %t)", separateMolecules))
+	flag.BoolVar(&adhesionMolecules, "adhesionMolecules", adhesionMolecules, fmt.Sprintf("Switch on molecules adhesion to floor, initially (default: %t)", adhesionMolecules))
 	flag.Float64Var(&defaultTemperature, "defaultTemperature", defaultTemperature, "Start temperature of molecules")
 
 	// Parse command line flags
@@ -170,6 +173,7 @@ func main() {
 			speed := rand.Float64()*(maxSpeed-minSpeed) + minSpeed
 			m.velX = speed * math.Cos(angle)
 			m.velY = speed * math.Sin(angle)
+			m.isStuck = false
 		}
 	})
 
@@ -190,6 +194,12 @@ func main() {
 	})
 	divideCheckbox.SetChecked(separateMolecules)
 
+	adhesionLabel := widget.NewLabel("Adhesion")
+	adhesionCheckbox := widget.NewCheck("", func(checked bool) {
+		adhesionMolecules = checked
+	})
+	adhesionCheckbox.SetChecked(adhesionMolecules)
+
 	// Arrange labels and sliders on the same line
 	topControl := container.NewHBox(
 		temperatureLabel,
@@ -200,6 +210,8 @@ func main() {
 		restartButton,
 	)
 	bottomControl := container.NewHBox(
+		adhesionLabel,
+		adhesionCheckbox,
 		electricXFieldLabel,
 		electricXFieldSliderContainer,
 		electricYFieldLabel,
@@ -280,6 +292,15 @@ func main() {
 				// Update position
 				m1.posX += m1.velX
 				m1.posY += m1.velY
+
+				//If enabled, it makes snow sticking to the floor
+				if adhesionMolecules {
+					if m1.posY >= windowHeight-moleculeSize {
+						m1.velX = 0
+						m1.velY = 0
+						m1.isStuck = true
+					}
+				}
 
 				// Check for collisions with walls
 				if m1.posX <= 0 || m1.posX >= windowWidth-moleculeSize {
@@ -416,6 +437,7 @@ func initializeMolecules(moleculeContainer *fyne.Container, temperature float64)
 		// Create a circle for the molecule
 		var circle *canvas.Circle
 		var isCharged bool
+		var isStuck = false
 
 		if i == 0 {
 			// First molecule is the charged particle
@@ -444,6 +466,7 @@ func initializeMolecules(moleculeContainer *fyne.Container, temperature float64)
 			velX:      velX,
 			velY:      velY,
 			isCharged: isCharged,
+			isStuck:   isStuck,
 		}
 		molecules = append(molecules, molecule)
 	}
@@ -517,6 +540,19 @@ func handleCollision(m1, m2 *Molecule) {
 		m1.velY += impulse * ny
 		m2.velX -= impulse * nx
 		m2.velY -= impulse * ny
+
+		if adhesionMolecules {
+			if m1.isStuck {
+				m2.velX = 0
+				m2.velY = 0
+				m2.isStuck = true
+			}
+			if m2.isStuck {
+				m1.velX = 0
+				m1.velY = 0
+				m1.isStuck = true
+			}
+		}
 	}
 }
 
